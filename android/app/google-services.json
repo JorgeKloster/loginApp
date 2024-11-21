@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "972175089727",
+    "project_id": "app-loginjorge",
+    "storage_bucket": "app-loginjorge.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:972175089727:android:ff3d051dc67da6c7e3588a",
+        "android_client_info": {
+          "package_name": "com.example.app_login"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiSHRTHnAhJAaRFRmxUEZ_AhUYszhr5B4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

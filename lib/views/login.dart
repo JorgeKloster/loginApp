@@ -1,4 +1,7 @@
-import 'package:app_login/main.dart';
+import 'package:app_login/services/authentication_service.dart';
+import 'package:app_login/views/registration.dart';
+import 'package:app_login/widgets/snack_bar_widget.dart';
+import 'package:app_login/widgets/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -10,76 +13,92 @@ class Login extends StatefulWidget {
 
 class _AppLoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _userController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  AuthenticationService _authenticationService = AuthenticationService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Login'),
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Form(
+              key: _formKey,
+              child: Column(children: [
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: Text(
+                    "Login",
+                    style: TextStyle(fontSize: 30),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: TextFormField(
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 1,
+                      decoration: decoration("email"),
+                      controller: _emailController,
+                      validator: (value) =>
+                          requiredValidator(value, "o usuário")),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: TextFormField(
+                    validator: (value) => requiredValidator(value, "a senha"),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 1,
+                    decoration: decoration("senha"),
+                    controller: _passwordController,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      String email = _emailController.text;
+                      String password = _passwordController.text;
+                      _authenticationService
+                          .loginUser(email: email, password: password)
+                          .then((erro) {
+                        if (erro != null) {
+                          snackBarWidget(
+                              context: context, title: erro, isError: true);
+                        }
+                      });
+                    }
+                  },
+                  child: Text(
+                    "Entrar",
+                  ),
+                ),
+                Padding(
+                    padding: EdgeInsets.all(15),
+                    child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => Registration()));
+                        },
+                        child: Text("Registre-se"))),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/esqueceuSenha");
+                        },
+                        child: Text(
+                          "Esqueceu a senha?",
+                          style: TextStyle(
+                              color: Colors.blue, fontWeight: FontWeight.bold),
+                        ))
+                  ],
+                )
+              ])),
         ),
-        body: Form(
-            key: _formKey,
-            child: Column(children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(85.0, 200, 85.0, 5.0),
-                child: Text(
-                  "Login",
-                  style: TextStyle(fontSize: 30),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(85.0, 30, 85.0, 5.0),
-                child: TextFormField(
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      labelText: "Usuário",
-                      hintText: "Digite o usuário",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  controller: _userController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Usuário Obrigatório";
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(85.0, 10, 85.0, 5.0),
-                child: TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Senha Obrigatória";
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.password),
-                      labelText: "Senha",
-                      hintText: "Digite a senha",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  controller: _passwordController,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => AppLogin()));
-                  }
-                },
-                child: Text(
-                  "Entrar",
-                ),
-              )
-            ])));
+      ),
+    );
   }
 }
