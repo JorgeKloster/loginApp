@@ -16,6 +16,19 @@ class _AppLoginState extends State<Login> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   AuthenticationService _authenticationService = AuthenticationService();
+  bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.text = 'minhasenha';
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +59,25 @@ class _AppLoginState extends State<Login> {
                           requiredValidator(value, "o usuário")),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(15),
-                  child: TextFormField(
-                    validator: (value) => requiredValidator(value, "a senha"),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 1,
-                    decoration: decoration("senha"),
-                    controller: _passwordController,
-                  ),
-                ),
+                    padding: EdgeInsets.all(15),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          validator: (value) =>
+                              requiredValidator(value, "a senha"),
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 1,
+                          decoration: decoration("senha"),
+                          controller: _passwordController,
+                          obscureText: _obscureText,
+                        ),
+                        IconButton(
+                            onPressed: _togglePasswordVisibility,
+                            icon: Icon(
+                              Icons.remove_red_eye,
+                            ))
+                      ],
+                    )),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
