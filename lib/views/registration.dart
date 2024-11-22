@@ -52,8 +52,7 @@ class _AppLoginState extends State<Registration> {
                           maxLines: 1,
                           decoration: decoration("email"),
                           controller: _emailController,
-                          validator: (value) =>
-                              requiredValidator(value, "o email"),
+                          validator: (value) => requiredEmailValidator(value),
                         ),
                       ),
                       Padding(

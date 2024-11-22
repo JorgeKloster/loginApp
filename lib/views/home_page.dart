@@ -127,14 +127,16 @@ class _HomePageState extends State<HomePage> {
             'Terça',
             'Quarta',
             'Quinta',
-            'Sexta'
+            'Sexta',
+            'Sábado',
+            'Domingo'
           ];
           String? _selectedTrainingOption;
           final List<String> _trainingOptions = [
             'Peito',
             'Costas',
-            'Perna',
-            'Braço'
+            'Pernas',
+            'Braços'
           ];
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(

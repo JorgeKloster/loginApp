@@ -1,8 +1,12 @@
+import 'dart:ffi';
+
 import 'package:app_login/services/authentication_service.dart';
 import 'package:app_login/views/registration.dart';
 import 'package:app_login/widgets/snack_bar_widget.dart';
 import 'package:app_login/widgets/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -17,16 +21,42 @@ class _AppLoginState extends State<Login> {
   TextEditingController _passwordController = TextEditingController();
   AuthenticationService _authenticationService = AuthenticationService();
   bool _obscureText = true;
+  bool _rememberMe = false;
 
   @override
   void initState() {
     super.initState();
     _passwordController.text = 'minhasenha';
+    _loadLoginState();
   }
 
   void _togglePasswordVisibility() {
     setState(() {
       _obscureText = !_obscureText;
+    });
+  }
+
+  void _saveLoginState(String email, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (_rememberMe) {
+      await prefs.setString('email', email);
+      await prefs.setString('password', password);
+      await prefs.setBool('remember', _rememberMe);
+    } else {
+      await prefs.remove('email');
+      await prefs.remove('password');
+      await prefs.setBool('remember', false);
+    }
+  }
+
+  void _loadLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberMe = prefs.getBool('remember') ?? false;
+      if (_rememberMe) {
+        _emailController.text = prefs.getString('email') ?? '';
+        _passwordController.text = prefs.getString('password') ?? '';
+      }
     });
   }
 
@@ -51,12 +81,12 @@ class _AppLoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.all(15),
                   child: TextFormField(
-                      keyboardType: TextInputType.multiline,
-                      maxLines: 1,
-                      decoration: decoration("email"),
-                      controller: _emailController,
-                      validator: (value) =>
-                          requiredValidator(value, "o usuário")),
+                    keyboardType: TextInputType.emailAddress,
+                    maxLines: 1,
+                    decoration: decoration("email"),
+                    controller: _emailController,
+                    validator: (value) => requiredEmailValidator(value),
+                  ),
                 ),
                 Padding(
                     padding: EdgeInsets.all(15),
@@ -78,11 +108,29 @@ class _AppLoginState extends State<Login> {
                             ))
                       ],
                     )),
+                Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Checkbox(
+                        value: _rememberMe,
+                        onChanged: (value) {
+                          setState(() {
+                            _rememberMe = value ?? false;
+                          });
+                        },
+                      ),
+                      Text('Lembrar-me'),
+                    ],
+                  ),
+                ),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       String email = _emailController.text;
                       String password = _passwordController.text;
+                      _saveLoginState(email, password);
                       _authenticationService
                           .loginUser(email: email, password: password)
                           .then((erro) {
